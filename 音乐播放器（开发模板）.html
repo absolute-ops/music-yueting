@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+  <title>Document</title>
+  <style>
+    body,
+    ul,
+    dl,
+    dd {
+      margin: 0px;
+      padding: 0px;
+    }
+
+    .wrap {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: url('images/bg.jpg') no-repeat;
+      background-size: 100% 100%;
+    }
+
+    .play_wrap {
+      width: 800px;
+      height: 544px;
+      position: fixed;
+      left: 50%;
+      top: 50%;
+      margin-left: -400px;
+      margin-top: -272px;
+      /* background-color: #f9f9f9; */
+      background-size: 800px 544px !important;
+    }
+
+    .search_bar {
+      height: 60px;
+      overflow: hidden;
+      border-top-left-radius: 4px;
+      border-top-right-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      z-index: 11;
+    }
+
+    .search_bar img {
+      margin-left: 23px;
+    }
+
+    .search_bar input {
+      margin-right: 23px;
+      width: 296px;
+      height: 34px;
+      border-radius: 17px;
+      border: 0px;
+      background: url('') 265px center no-repeat rgba(255, 255, 255, 0.45);
+      text-indent: 15px;
+      outline: none;
+    }
+
+    .search-icon {
+      position: absolute;
+      right: 35px;
+      cursor: pointer;
+    }
+
+    .center_con {
+      height: 435px;
+      background-color: rgba(255, 255, 255, 0.5);
+      display: flex;
+      overflow: hidden;
+    }
+
+    .song_wrapper {
+      width: 200px;
+      height: 435px;
+      box-sizing: border-box;
+      padding: 10px;
+      list-style: none;
+      background: url('images/line.png') right center no-repeat;
+      position: relative;
+      /* overflow: hidden; */
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    .song_list li {
+      font-size: 12px;
+      color: #333;
+      line-height: 36px;
+      width: 180px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .song_list .active {
+      color: #da651e;
+    }
+
+    .player_con {
+      width: 400px;
+      position: relative;
+      overflow-y: auto;
+      overflow-x: hidden;
+    }
+
+    .player_con li {
+      text-align: center;
+      margin: 10px 0;
+    }
+
+    .disc {
+      position: absolute;
+      left: 73px;
+      top: 60px;
+      z-index: 9;
+    }
+
+    .cover {
+      position: absolute;
+      left: 125px;
+      top: 112px;
+      width: 150px;
+      height: 150px;
+      border-radius: 75px;
+      z-index: 8;
+    }
+
+    .comment_list {
+      width: 200px;
+      height: 435px;
+      box-sizing: border-box;
+      padding: 10px;
+      list-style: none;
+      background: url('images/line.png') left center no-repeat;
+      overflow-y: auto;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    .comment_list dl {
+      padding-left: 55px;
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .comment_list dt {
+      position: absolute;
+      left: 4px;
+      top: 0px;
+    }
+
+    .comment_list dt img {
+      width: 40px;
+      height: 40px;
+      border-radius: 20px;
+    }
+
+    .comment_list dd {
+      font-size: 12px;
+    }
+
+    .comment_list .name {
+      font-weight: bold;
+      color: #333;
+      margin-top: 5px;
+    }
+
+    .comment_list .detail {
+      color: #666;
+      margin-top: 5px;
+      line-height: 18px;
+    }
+
+    .audio_con {
+      height: 50px;
+      background-color: #f1f3f4;
+      border-bottom-left-radius: 4px;
+      border-bottom-right-radius: 4px;
+      position: relative;
+    }
+
+    .myaudio {
+      width: 800px;
+      height: 40px;
+      /* margin-top: 5px; */
+      outline: none;
+      background-color: #f1f3f4;
+    }
+
+    /* 旋转的动画 */
+    @keyframes Rotate {
+      from {
+        transform: rotateZ(0);
+      }
+
+      to {
+        transform: rotateZ(360deg);
+      }
+    }
+
+    /* 旋转的类名 */
+    .autoRotate {
+      animation-name: Rotate;
+      animation-iteration-count: infinite;
+      animation-play-state: paused;
+      animation-timing-function: linear;
+      animation-duration: 5s;
+    }
+
+    /* 是否正在播放 */
+    .playing {
+      animation-play-state: running;
+    }
+
+    .play_bar {
+      position: absolute;
+      left: 200px;
+      top: -10px;
+      z-index: 10;
+      transform: rotate(-25deg);
+      transform-origin: 12px 12px;
+      transition: 1s;
+    }
+
+    /* 播放杆 转回去 */
+    .play_bar.playing {
+      transform: rotate(0);
+    }
+
+    /* vue的动画类 */
+    .list-enter-active,
+    .list-leave-active {
+      transition: all 1s;
+    }
+
+    .list-enter,
+    .list-leave-to {
+      opacity: 0;
+      transform: translateX(30px);
+    }
+
+    /*定义滚动条高宽及背景 高宽分别对应横竖滚动条的尺寸*/
+    ::-webkit-scrollbar {
+      /*滚动条宽度*/
+      width: 0;
+    }
+
+    /* 当前播放歌词 */
+    .red {
+      color: red;
+    }
+
+    /* 下一曲按钮 */
+    .nextMus {
+      position: absolute;
+      left: 13px;
+      top: 29px;
+      background-color: #f1f3f4;
+      border: 0px;
+      font-size: 16px !important;
+    }
+
+
+
+    [v-cloak] {
+      display: none;
+    }
+  </style>
+  <link rel="stylesheet" href="http://at.alicdn.com/t/font_2409617_a69obwtj7o4.css">
+</head>
+
+<body>
+  <div class="wrap" id="app">
+    <div class="play_wrap" id="player" :style="{background:'url('+musicImg + ') no-repeat'}" v-cloak>
+      <!-- 顶部歌曲搜索 -->
+      <div class="search_bar">
+        <img src="images/player_title.png" alt="" />
+        <!-- 搜索输入框 -->
+        <input type="text" placeholder="请输入你想听的歌曲" v-model="search" @keyup.enter="searchMusic" />
+        <!-- 搜索按钮 -->
+        <img src="images/zoom.png" class="search-icon" alt="" @click="searchMusic" />
+      </div>
+      <!-- 中间部分，歌曲播放整个面板 -->
+      <div class="center_con">
+        <!-- 歌曲列表 -->
+        <div class="song_wrapper">
+          <transition-group name="list" class="song_list" tag="ul">
+            <li @dblclick="dblMusicImg(music.id)" v-for="(music,index) in musicList"
+              :style="{transitionDelay:index*50 + 'ms'}" :key="index" v-cloak>{{music.name}} -
+              {{music.artists[0].name}}</li>
+          </transition-group>
+        </div>
+        <!-- 歌曲播放 -->
+        <template v-if="lyricShow">
+          <div class="player_con" @dblclick="dblLyricShow">
+            <!-- 播放触杆 -->
+            <img src="images/player_bar.png" class="play_bar " :class="{playing : musicPlay}" />
+            <!-- 黑胶碟片 -->
+            <img src="images/disc.png" class="disc autoRotate" :class="{playing : musicPlay}" />
+            <!-- 歌曲封面 -->
+            <img :src="musicImg" class="cover autoRotate" :class="{playing : musicPlay}" />
+          </div>
+        </template>
+        <!-- 歌词播放 -->
+        <template v-else>
+          <ul class="player_con" @dblclick="dblLyricShow" :style="{marginTop : lyricMov+'px'}">
+            <li v-for="(item,index) in lyric" :key="index">
+              <span @click="cliLyric(item.t)" :class="{red : index == lyricIndex}">{{item.c}}</span>
+            </li>
+          </ul>
+        </template>
+        <!-- 歌曲评论 -->
+        <div class="comment_list">
+          <transition-group name="list" tag="div">
+            <dl v-for="(comment,index) in musicCommentData" :style="{transitionDelay:index*100 + 'ms'}" :key="index">
+              <dt><img :src="comment.user.avatarUrl" alt="" /></dt>
+              <dd class="name">{{comment.user.nickname}}</dd>
+              <dd class="detail">{{comment.content}}</dd>
+            </dl>
+          </transition-group>
+
+        </div>
+      </div>
+      <!-- 底部歌曲播放 -->
+      <div class="audio_con">
+        <audio controls="controls" autoplay="autoplay" class="myaudio" :src="musicSrc" @play="cliPlay" @pause="clipause"
+          @ended="songEnd" @timeupdate="lyricMovs"></audio>
+        <button class="iconfont icon-xiayiqu nextMus" @click="songEnd" :disabled =nextBut></button>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
+<script src="./lib/vue.js"></script>
+<script src="./lib/axios.js"></script>
+<script src="./index.js"></script>
