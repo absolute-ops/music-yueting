@@ -257,25 +257,35 @@
     /* 当前播放歌词 */
     .red {
       color: red;
+      /* transform: translate(2); */
+      font-size: 18px;
     }
 
     /* 下一曲按钮 */
     .nextMus {
       position: absolute;
-      left: 13px;
+      left: 21px;
       top: 29px;
       background-color: #f1f3f4;
       border: 0px;
       font-size: 16px !important;
     }
 
-
+    /* 上一首按钮 */
+    .lastMus {
+      position: absolute;
+      left: 0;
+      top: 29px;
+      background-color: #f1f3f4;
+      border: 0px;
+      font-size: 16px !important;
+    }
 
     [v-cloak] {
       display: none;
     }
   </style>
-  <link rel="stylesheet" href="http://at.alicdn.com/t/font_2409617_a69obwtj7o4.css">
+  <link rel="stylesheet" href="http://at.alicdn.com/t/font_2409617_ugemzn69l6.css">
 </head>
 
 <body>
@@ -334,7 +344,9 @@
       <div class="audio_con">
         <audio controls="controls" autoplay="autoplay" class="myaudio" :src="musicSrc" @play="cliPlay" @pause="clipause"
           @ended="songEnd" @timeupdate="lyricMovs"></audio>
-        <button class="iconfont icon-xiayiqu nextMus" @click="songEnd" :disabled =nextBut></button>
+
+        <button class="iconfont icon-shangyiqu lastMus" @click="songLast" :disabled=lastBut></button>
+        <button class="iconfont icon-xiayiqu nextMus" @click="songEnd" :disabled=nextBut></button>
       </div>
     </div>
   </div>

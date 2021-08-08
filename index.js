@@ -25,6 +25,8 @@ const app = new Vue({
     musicId: null,
     // 记录下一曲按钮禁用状态
     nextBut: true,
+    // 记录上一首按钮禁用状态
+    lastBut: true,
   },
   async created() {
     // 初始化渲染推荐歌曲
@@ -43,7 +45,9 @@ const app = new Vue({
     async dblMusicImg(id) {
       this.musicId = id;
       // 判断改变下一曲按钮状态
-      this.nextBut = this.nextBut? !this.nextBut : this.nextBut;
+      this.nextBut = this.nextBut ? !this.nextBut : this.nextBut;
+      // 判断改变上一首按钮状态
+      this.lastBut = this.lastBut ? !this.lastBut : this.lastBut;
       let res = await axios.get("https://autumnfish.cn/song/detail?ids=" + id);
       this.musicImg = res.data.songs[0].al.picUrl;
       // 调用播放歌曲
@@ -97,6 +101,7 @@ const app = new Vue({
           c: c
         })
       });
+      console.log(this.lyric)
       // let lyricReg = /\[\d*:\d*((\.|\:)\d*)*\]/g;
       // this.lyric = a.map(item => {
       //   return item.replace(lyricReg, "")
@@ -121,6 +126,21 @@ const app = new Vue({
       // 调用播放音乐
       this.dblMusicImg(id)
     },
+    // 切换上一首
+    songLast() {
+      let id;
+      let songLastIndex;
+      this.musicList.forEach((item, index) => {
+        if (item.id == this.musicId) {
+          songLastIndex = index;
+          if (index == 0) return
+          id = this.musicList[index - 1].id;
+
+        }
+      })
+      if (songLastIndex == 0) return
+      this.dblMusicImg(id)
+    },
     // 同步歌词滚动
     lyricMovs() {
       const audio = document.querySelector("audio");
@@ -128,13 +148,13 @@ const app = new Vue({
       this.lyric.forEach((item, index) => {
         if (t >= item.t) {
           this.lyricIndex = index;
-          this.lyricTop = -index * 16 + 120
+          this.lyricTop = -index * 25 + 50
         }
       })
     },
     // 点击歌词跳转播放位置
     cliLyric(t) {
-      this.lyricSite = t;
+      // this.lyricSite = t;  
       const audio = document.querySelector("audio");
       audio.currentTime = t;
     }
